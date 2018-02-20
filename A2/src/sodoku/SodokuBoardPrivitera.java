@@ -26,7 +26,7 @@ public class SodokuBoardPrivitera {
 			FileReader fileReader = new FileReader(input);
 			Scanner board = new Scanner(fileReader);
 
-			Pattern pat = Pattern.compile("p cnf \\d+ \\d+");
+			Pattern pat = Pattern.compile("c");
 
 			while (board.findInLine(pat) != null) {
 				// once at 'p cnf' read line
