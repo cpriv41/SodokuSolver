@@ -28,7 +28,7 @@ public class mainPrivitera {
 
 			} else if (args.length > 1) {
 				for (String input : args) {
-					new SodokuToSatReducerPrivitera(input);
+					new SodokuToSatReducerPrivitera(new File(input));
 				}
 			} else {
 				System.out.println("Must specify inputFileName from command line");
