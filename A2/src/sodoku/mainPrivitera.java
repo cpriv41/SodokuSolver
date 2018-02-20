@@ -1,5 +1,6 @@
 package sodoku;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 
 public class mainPrivitera {
@@ -14,25 +15,31 @@ public class mainPrivitera {
 	 */
 
 	public static void main(String[] args) throws FileNotFoundException {
+	try {
+			
 
-		SodokuToSatReducerPrivitera satReducer;
-
-		if (args.length < 1) {
-			System.out.println("Must specify inputFileName from command line");
-			System.exit(1);
-		}
-		if (args.length == 1) {
-			satReducer = new SodokuToSatReducerPrivitera(args[0]);
-
-		} else if (args.length > 1) {
-			for (String input : args) {
-				satReducer = new SodokuToSatReducerPrivitera(input);
+			if (args.length < 1) {
+				System.out.println("Must specify inputFileName from command line");
+				System.exit(1);
 			}
-		} else {
-			System.out.println("Must specify inputFileName from command line");
-			System.exit(1);
-		}
+			if (args.length == 1) {
+				
+				new SodokuToSatReducerPrivitera(new File(args[0]));
 
+			} else if (args.length > 1) {
+				for (String input : args) {
+					new SodokuToSatReducerPrivitera(input);
+				}
+			} else {
+				System.out.println("Must specify inputFileName from command line");
+				System.exit(1);
+			}
+
+		
+	} catch (Exception e) {
+		System.out.print(e.getClass());
 	}
 
 }
+}
+
