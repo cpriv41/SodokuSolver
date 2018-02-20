@@ -29,7 +29,7 @@ public class SodokuBoardPrivitera {
 			Pattern pat = Pattern.compile("c");
 
 			while (board.findInLine(pat) != null) {
-				// once at 'p cnf' read line
+				// once at 'c' read line
 				board.nextLine();
 
 				// get board dimensions
