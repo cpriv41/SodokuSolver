@@ -1,59 +1,128 @@
 package sodoku;
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.regex.Pattern;
+import org.apache.commons.math;
 
 public class SodokuToSatReducerPrivitera {
 
 	public int boxWidth;
 	public int boxHeight;
 	public int numCells;
-	public int boardSize;
-	SodokuBoardPrivitera input;
-	SodokuBoardPrivitera boardOutput;
-	final private static int[] DEFAULT_VALUE = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+	boolean[] variables;
+	boolean[] boxes;
+	SodokuBoardPrivitera sodokuBoard;
+	// final private static int[] DEFAULT_VALUE = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
-	public SodokuToSatReducerPrivitera(File inputFile) {
+	public SodokuToSatReducerPrivitera(File inputFile) throws Exception {
 
-		input = new SodokuBoardPrivitera(inputFile);
-
+		createBoard(inputFile);
+		// 729 variables
+		variables = new boolean[sodokuBoard.getNumberOfCells() * 9];
+		boxes = new boolean[sodokuBoard.getBoardSize()];
+		initializeBoard();
 	}
 
-	public SodokuBoardPrivitera createBoard(File inputFile) {
+	public void createBoard(File inputFile) throws Exception {
 
 		Scanner board = null;
 
 		try {
-			FileReader fileReader =new FileReader(inputFile);
-			board = new Scanner(fileReader);
-		} catch (Exception e) {
-			System.out.print(e.getClass());
-			System.exit(1);
-		}
 
-		Pattern pat = Pattern.compile("c");
+			FileInputStream inFile = new FileInputStream(inputFile);
+			board = new Scanner(inFile);
+			System.out.println("File " + inputFile + " has been openned");
 
-		while (board.findInLine(pat) != null) {
-			// once at 'c' read line
-			board.nextLine();
+			Pattern pat = Pattern.compile("c");
+
+			while (board.findInLine(pat) != null)
+				// skip comments
+				// once at 'c' read line
+				board.nextLine();
 
 			// get board dimensions
 			boxWidth = board.nextInt();
 			boxHeight = board.nextInt();
 
-			int boardWidth = boxWidth * 3;
-			int boardHeight = boxHeight * 3;
-
-			boardOutput = new SodokuBoardPrivitera(boardWidth, boardHeight);
+			sodokuBoard = new SodokuBoardPrivitera(boxWidth, boxHeight);
 
 			// process data from input file
-			for (int cell = 0; cell < boardOutput.getNumberOfCells(); cell++) {
-				boardOutput.setCellValue(cell, board.nextInt());
+			for (int cell = 1; cell <= sodokuBoard.getNumberOfCells() - 1; cell++) {
+				sodokuBoard.setCellValue(cell - 1, board.nextInt());
+
+			}
+			System.out.println(sodokuBoard.toString());
+			// int[] clauses =
+			// Math3.binomialCoefficientLog(sodokuBoard.getBoardSize(), 2);
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			board.close();
+		}
+
+		return;
+
+	}
+
+	public void initializeBoard() {
+
+		for (int i = 0; i < sodokuBoard.getNumberOfCells(); i++) {
+			if (sodokuBoard.getCellValue(i) != 0)
+				variables[getVariableIndex(sodokuBoard.getCellRow(i), sodokuBoard.getCellColumn(i),
+						sodokuBoard.getCellValue(i))] = true;
+		}
+		return;
+
+	}
+
+	public void initialzeBoxStatus() {
+		boolean[] boxStatus = new boolean[sodokuBoard.getBoardSize()];
+		// Check all boxes on board
+		for (int i = 0; i < sodokuBoard.getBoardSize(); i++) {
+			// Assume that the box has all required digits
+			boxes[i] = true;
+			// Check every digit in the box
+			for (int j = 0; j < sodokuBoard.getBoxHeight(); j++) {
+				for (int k = 0; k < sodokuBoard.getBoxWidth(); k++) {
+					// Tick the appropriate indicator for every non-zero value
+					if (getBoxValue(i, j, k) != 0)
+						boxStatus[getBoxValue(i, j, k)] = true;
+				}
+			}
+			// If any digits are missing, set the box status to false
+			for (int x = 0; x < boxStatus.length; x++) {
+				if (boxStatus[x] != true)
+					boxes[i] = false;
+			}
+			// reset indicators for next box analysis
+			Arrays.fill(boxStatus, false);
+		}
+		return;
+	}
+
+	public int getBoxValue(int boxNum, int row, int column) {
+
+		final int[] box = new int[sodokuBoard.getBoardSize()];
+		final int rowLocation = (row - 1) / sodokuBoard.getBoxWidth();
+		final int colLocation = (column - 1) / sodokuBoard.getBoxHeight();
+		// int counter = 0;
+		// REGION_SIZE (3) Rows/Columns from rowBase/ColumnBase
+		for (int i = rowLocation; i < sodokuBoard.getBoxWidth() + rowLocation; i++) {
+			for (int j = colLocation; j < sodokuBoard.getBoxWidth() + colLocation; j++) {
+				box[boxNum] = (boxHeight * (sodokuBoard.getCellRow(i) / boxHeight)
+						+ (sodokuBoard.getCellColumn(j) / boxWidth));
 			}
 		}
-		return boardOutput;
+		return box[boxNum];
+	}
+
+	public void initializeBoxes(int row, int col) {
+
+		return;
 	}
 
 	public void reduceBoard(int row, int column, int value) {
@@ -62,55 +131,76 @@ public class SodokuToSatReducerPrivitera {
 
 	}
 
-	public boolean atLeastOneInRow(int[] row, int value) {
+	private int getVariableIndex(int row, int column, int value) {
 
-		for (int i : row) {
-			if (i == value && value < 10 && value != 0)
+		return (value - 1) + (sodokuBoard.getNumberOfCells()) + row * (sodokuBoard.getBoardSize() + column);
+	}
+
+	public boolean atLeastOneInRow(int row, int value) {
+
+		for (int j = 0; j < sodokuBoard.getBoardSize(); j++) {
+			if (variables[getVariableIndex(row, j, value)] == true && isValid(value) == true)
+
 				return true;
-			else
-				return false;
+
 		}
 		return false;
 
 	}
 
-	public boolean atMostOneInRow(int[] row, int value) {
+	private boolean isValid(int value) {
+		return (value > 0 && value < 10);
+	}
 
-		int[] check = null;
-		int count = 0;
-
-		for (int i = 0; i < row.length; i++) {
-			if (i == value)
-				check[i] += check[value];
+	private boolean isValidMove(int row, int value) {
+		while (atLeastOneInRow(row, value) == true) {
+			if (sodokuBoard.getCellRow(value) != sodokuBoard.getCellColumn(value)
+					|| (sodokuBoard.getCellRow(value)) != sodokuBoard.getCellBox(value)
+					|| sodokuBoard.getCellColumn(value) != sodokuBoard.getCellBox(value)) {
+				return true;
+			}
 		}
-		for (int i = 0; i < check.length; i++) {
-			if (i == value)
-				count++;
+		return false;
+	}
+
+	private void atMostOneInRow(int row, int value) {
+
+		for (int i = 0; i < sodokuBoard.getBoardSize(); i++) {
+			for (int j = i + 1; j < sodokuBoard.getBoardSize(); j++) {
+				if (variables[getVariableIndex(i, j, value)] == true) {
+					System.out.println();
+				}
+			}
 		}
-		if (count > 1)
-			return false;
-		else
-			return true;
 
 	}
 
-	public boolean atLeastOneInColumn() {
+	public boolean atLeastOneInColumn(int column, int value) {
+		for (int i = 0; i < sodokuBoard.getBoardSize(); i++) {
+			if (variables[getVariableIndex(i, column, value)] == true && isValid(value) == true)
+				return true;
+		}
+		return false;
 
 	}
 
-	public boolean atMostOneInColumn() {
+	public boolean atMostOneInColumn(int column, int value) {
+		return false;
 
 	}
 
-	public boolean atLeastOneInBox() {
+	public boolean atLeastOneInBox(int box, int value) {
+		return false;
 
 	}
 
-	public boolean atMostOneInBox() {
+	public boolean atMostOneInBox(int box, int value) {
+		return false;
 
 	}
 
 	public boolean atLeastAtMostValue(int row, int column) {
+		return false;
 
 	}
 
