@@ -12,10 +12,11 @@ public class SodokuBoardPrivitera {
 	private int boxWidth;
 	private int boxHeight;
 	private int numCells;
+	private int[] boardCells;
 
 	/**
-	 * Constructor to take input parameters which is used to create a sudoku board
-	 * as a linear array, called boardCells
+	 * Constructor to take input parameters which is used to create a sudoku
+	 * board as a linear array, called boardCells
 	 * 
 	 * @param boxWidth
 	 * @param boxHeight
@@ -26,9 +27,8 @@ public class SodokuBoardPrivitera {
 		this.boxWidth = boxWidth;
 		this.boxHeight = boxHeight;
 		this.numCells = (boxWidth * boxWidth) * (boxHeight * boxHeight);
+		boardCells = new int[numCells];
 	}
-
-	private int[] boardCells = new int[numCells];
 
 	/**
 	 * row to which the cell belongs in the 2D form of the Sudoku board
