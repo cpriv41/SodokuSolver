@@ -24,11 +24,13 @@ public class mainPrivitera {
 			}
 			if (args.length == 1) {
 				
-				new SodokuToSatReducerPrivitera(new File(args[0]));
+				new SodokuToSatReducerPrivitera(new File(args[0])).reducer();
+
 
 			} else if (args.length > 1) {
 				for (String input : args) {
-					new SodokuToSatReducerPrivitera(new File(input));
+					new SodokuToSatReducerPrivitera(new File(input)).reducer();
+					
 				}
 			} else {
 				System.out.println("Must specify inputFileName from command line");
@@ -40,6 +42,9 @@ public class mainPrivitera {
 		System.out.print(e.getClass());
 	}
 
-}
+//	System.out.println(args[0].toString());
+
 }
 
+	
+}
