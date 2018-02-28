@@ -28,9 +28,10 @@ public class SodokuToSatReducerPrivitera {
 
 		createBoard(inputFile);
 		// 729 variables
-		variables = new boolean[sodokuBoard.getNumberOfCells() * 9];
+		variables = new boolean[sodokuBoard.getNumberOfCells() * sodokuBoard.getBoardSize()];
 		// boxes = new boolean[sodokuBoard.getBoardSize()];
 		initializeBoard();
+		reduceBoard();
 
 	}
 
