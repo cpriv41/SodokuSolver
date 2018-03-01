@@ -12,6 +12,7 @@ public class SodokuBoardPrivitera {
 	private int boxWidth;
 	private int boxHeight;
 	private int numCells;
+	private int boardSize;
 	private int[] boardCells;
 
 	/**
@@ -28,6 +29,7 @@ public class SodokuBoardPrivitera {
 		this.boxHeight = boxHeight;
 		this.numCells = (boxWidth * boxWidth) * (boxHeight * boxHeight);
 		boardCells = new int[numCells];
+		boardSize = boxWidth * boxHeight;
 	}
 
 	/**
@@ -36,7 +38,7 @@ public class SodokuBoardPrivitera {
 	 * @param cell
 	 */
 	public int getCellRow(int cell) {
-		int row = (cell / (boxWidth * boxHeight));
+		int row = (cell / (boardSize));
 		return row;
 	}
 
@@ -46,7 +48,7 @@ public class SodokuBoardPrivitera {
 	 * @param cell
 	 */
 	public int getCellColumn(int cell) {
-		int column = (cell % (boxWidth * boxHeight));
+		int column = (cell % (boardSize));
 		return column;
 	}
 
@@ -79,7 +81,7 @@ public class SodokuBoardPrivitera {
 
 		for (int i = 0; i < numCells; i++) {
 			// if value in box is not 0, add it
-			if (((i) % (boxWidth * boxHeight)) != 0) {
+			if (((i) % (boardSize)) != 0) {
 				board += (boardCells[i]) + " ";
 			} else {
 				board += " \n" + boardCells[i] + " ";
