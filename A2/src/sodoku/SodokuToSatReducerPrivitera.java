@@ -76,12 +76,17 @@ public class SodokuToSatReducerPrivitera {
 
 	}
 
-	public void initializeBoard() {
+	private int getVariableIndex(int row, int column, int value) {
 
+		return (value - 1) * sodokuBoard.getNumberOfCells() + 
+				row * sodokuBoard.getBoardSize() + column;
+	}
+	
+	public void initializeBoard() {
 		for (int i = 0; i < sodokuBoard.getNumberOfCells(); i++) {
 			if (sodokuBoard.getCellValue(i) != 0) {
-				variables[sodokuBoard.getCellValue(i)] = true;
-			}
+				variables[getVariableIndex(sodokuBoard.getCellRow(i), sodokuBoard.getCellColumn(i),
+						sodokuBoard.getCellValue(i))] = true;			}
 		}
 		return;
 
